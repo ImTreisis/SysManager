@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from services.gpu_service import get_gpu_info
 from services.process_service import get_processes
 from services.system_service import (
     get_cpu_info,
@@ -51,6 +52,11 @@ def read_disk():
 @app.get("/api/system/network")
 def read_network():
     return get_network_info()
+
+
+@app.get("/api/system/gpu")
+def read_gpu():
+    return get_gpu_info()
 
 
 @app.get("/api/processes")

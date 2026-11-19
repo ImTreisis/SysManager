@@ -6,10 +6,15 @@ function Dashboard({ data }) {
   const cpuPercent = Math.round(data.cpu.percent);
   const memoryPercent = Math.round(data.memory.percent);
   const diskPercent = Math.round(data.disk.percent);
+  const gpuPercent = typeof data.gpu.utilization_percent === 'number'
+    ? Math.round(data.gpu.utilization_percent)
+    : null;
+  const gpuNames = (data.gpu.devices ?? []).map((device) => device.name).join(', ');
   const resources = [
     { label: 'Processor', percent: cpuPercent, color: 'bg-sky-400' },
     { label: 'Memory', percent: memoryPercent, color: 'bg-violet-400' },
     { label: 'System drive', percent: diskPercent, color: 'bg-emerald-400' },
+    ...(gpuPercent === null ? [] : [{ label: 'GPU busiest engine', percent: gpuPercent, color: 'bg-fuchsia-400' }]),
   ];
 
   return (
@@ -51,11 +56,13 @@ function Dashboard({ data }) {
           progressColor="bg-emerald-400"
         />
         <MetricCard
-          label="GPU preview · sample"
-          value="37"
-          unit="%"
-          detail="NVIDIA GeForce RTX 3060 · 4.8 / 12 GB VRAM (example)"
-          percent={37}
+          label="GPU utilization"
+          value={gpuPercent ?? 'Unavailable'}
+          unit={gpuPercent === null ? '' : '%'}
+          detail={data.gpu.dedicated_memory_used_bytes === null
+            ? (data.gpu.reason ?? 'GPU memory counters are unavailable')
+            : `${formatBytes(data.gpu.dedicated_memory_used_bytes)} dedicated memory in use`}
+          percent={gpuPercent ?? undefined}
           progressColor="bg-fuchsia-400"
         />
         <MetricCard
@@ -99,7 +106,8 @@ function Dashboard({ data }) {
               ['Installed memory', formatBytes(data.memory.total_bytes)],
               ['System drive', data.disk.path],
               ['Available disk', formatBytes(data.disk.free_bytes)],
-              ['Graphics card', 'RTX 3060 · sample only'],
+              ['Graphics adapters', gpuNames || 'No GPU name reported'],
+              ['Dedicated GPU memory in use', formatBytes(data.gpu.dedicated_memory_used_bytes)],
               ['Network counters', 'Totals since startup'],
             ].map(([label, value]) => (
               <div key={label} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">

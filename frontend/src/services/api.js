@@ -26,13 +26,14 @@ export async function fetchDashboardData() {
     throw new Error('The local agent is not ready.');
   }
 
-  const [cpu, memory, disk, network, processes] = await Promise.all([
+  const [cpu, memory, disk, network, gpu, processes] = await Promise.all([
     getJson('/api/system/cpu'),
     getJson('/api/system/memory'),
     getJson('/api/system/disk'),
     getJson('/api/system/network'),
+    getJson('/api/system/gpu'),
     getJson('/api/processes'),
   ]);
 
-  return { cpu, memory, disk, network, processes };
+  return { cpu, memory, disk, network, gpu, processes };
 }
