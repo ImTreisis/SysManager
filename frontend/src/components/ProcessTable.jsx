@@ -1,9 +1,9 @@
 const sampleProcesses = [
-  { name: 'System', pid: 4, cpu: '0.2%', memory: '184 MB', tag: 'S' },
-  { name: 'Google Chrome', pid: 8420, cpu: '8.4%', memory: '1.26 GB', tag: 'C' },
-  { name: 'Visual Studio Code', pid: 11644, cpu: '3.1%', memory: '684 MB', tag: 'V' },
-  { name: 'Windows Explorer', pid: 3248, cpu: '1.2%', memory: '212 MB', tag: 'W' },
-  { name: 'Spotify', pid: 9672, cpu: '0.7%', memory: '328 MB', tag: 'S' },
+  { name: 'System', pid: 4, cpu: '0.2%', memory: '184 MB' },
+  { name: 'Google Chrome', pid: 8420, cpu: '8.4%', memory: '1.26 GB' },
+  { name: 'Visual Studio Code', pid: 11644, cpu: '3.1%', memory: '684 MB' },
+  { name: 'Windows Explorer', pid: 3248, cpu: '1.2%', memory: '212 MB' },
+  { name: 'Spotify', pid: 9672, cpu: '0.7%', memory: '328 MB' },
 ];
 
 function ProcessTable() {
@@ -27,15 +27,10 @@ function ProcessTable() {
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
-            {sampleProcesses.map((process, index) => (
+            {sampleProcesses.map((process) => (
               <tr key={process.pid} className="transition hover:bg-white/[0.025]">
                 <td className="px-6 py-3.5">
-                  <div className="flex items-center gap-3">
-                    <span className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold ${index === 0 ? 'bg-sky-400/10 text-sky-300' : 'bg-slate-800 text-slate-300'}`}>
-                      {process.tag}
-                    </span>
-                    <span className="font-medium text-slate-200">{process.name}</span>
-                  </div>
+                  <span className="font-medium text-slate-200">{process.name}</span>
                 </td>
                 <td className="px-4 py-3.5 font-mono text-xs text-slate-500">{process.pid}</td>
                 <td className="px-4 py-3.5 text-slate-300">{process.cpu}</td>

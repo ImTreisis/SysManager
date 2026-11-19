@@ -1,5 +1,3 @@
-import Icon from '../components/Icon.jsx';
-
 const steps = [
   {
     number: '01',
@@ -31,8 +29,7 @@ function AgentInstructions() {
       </div>
 
       <section className="rounded-2xl border border-white/[0.07] bg-slate-900/70 p-5 sm:p-7">
-        <div className="mb-6 flex items-start gap-4 rounded-xl border border-amber-300/15 bg-amber-300/[0.045] p-4">
-          <span className="mt-0.5 text-amber-200"><Icon name="settings" className="h-5 w-5" /></span>
+        <div className="mb-6 rounded-xl border border-amber-300/15 bg-amber-300/[0.045] p-4">
           <div>
             <h2 className="text-sm font-semibold text-amber-100">Development setup</h2>
             <p className="mt-1 text-sm leading-5 text-amber-100/65">The downloadable Windows app will be prepared later. For now, start the agent from this project using the commands below.</p>
@@ -41,8 +38,8 @@ function AgentInstructions() {
 
         <ol className="space-y-6">
           {steps.map((step) => (
-            <li key={step.number} className="grid gap-3 sm:grid-cols-[42px_1fr]">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-sky-300/20 bg-sky-300/[0.07] font-mono text-xs text-sky-200">{step.number}</span>
+            <li key={step.number} className="grid gap-3 sm:grid-cols-[32px_1fr]">
+              <span className="pt-0.5 font-mono text-xs text-sky-300">{step.number}</span>
               <div>
                 <h3 className="font-medium text-white">{step.title}</h3>
                 <p className="mt-1 text-sm leading-5 text-slate-500">{step.description}</p>

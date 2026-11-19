@@ -1,19 +1,12 @@
-import Icon from './Icon.jsx';
-
-function MetricCard({ label, value, unit, detail, percent, icon, color, progressColor, children }) {
+function MetricCard({ label, value, unit, detail, percent, progressColor, children }) {
   return (
     <article className="rounded-2xl border border-white/[0.07] bg-slate-900/70 p-5 shadow-xl shadow-black/10">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-slate-400">{label}</p>
-          <p className="mt-4 flex items-baseline gap-1.5">
-            <span className="text-3xl font-semibold tracking-tight text-white">{value}</span>
-            {unit && <span className="text-sm text-slate-500">{unit}</span>}
-          </p>
-        </div>
-        <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}>
-          <Icon name={icon} className="h-5 w-5" />
-        </span>
+      <div>
+        <p className="text-sm font-medium text-slate-400">{label}</p>
+        <p className="mt-4 flex items-baseline gap-1.5">
+          <span className="text-3xl font-semibold tracking-tight text-white">{value}</span>
+          {unit && <span className="text-sm text-slate-500">{unit}</span>}
+        </p>
       </div>
       {typeof percent === 'number' ? (
         <div className="mt-5">
