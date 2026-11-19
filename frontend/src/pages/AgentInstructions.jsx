@@ -51,8 +51,8 @@ function AgentInstructions() {
       </section>
 
       <section className="mt-5 rounded-2xl border border-white/[0.07] bg-slate-900/50 p-5 sm:p-6">
-        <h2 className="font-semibold text-white">What happens next?</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-400">Once the frontend is connected to the agent, the dashboard will replace its sample values with live readings and show a clear message if the agent is offline.</p>
+        <h2 className="font-semibold text-white">How the browser connects</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-400">The dashboard requests readings directly from 127.0.0.1:8765. If the agent is stopped, the dashboard shows an offline message and lets you retry after starting it.</p>
       </section>
     </main>
   );

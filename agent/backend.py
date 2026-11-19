@@ -1,4 +1,7 @@
+import os
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from services.process_service import get_processes
 from services.system_service import (
@@ -10,6 +13,18 @@ from services.system_service import (
 
 
 app = FastAPI(title="Windows System Monitor Agent")
+
+allowed_origins = os.environ.get(
+    "WINDOWS_MONITOR_ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173",
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[origin.strip() for origin in allowed_origins.split(",") if origin.strip()],
+    allow_credentials=False,
+    allow_methods=["GET"],
+    allow_headers=["Accept"],
+)
 
 
 @app.get("/api/status")
