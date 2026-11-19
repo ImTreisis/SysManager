@@ -1,0 +1,23 @@
+# Python
+agent/.venv/
+agent/__pycache__/
+agent/**/*.py[cod]
+
+# Node.js / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+
+# Local environment and editor files
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+
+# Generated Windows packages
+agent/build/
+agent/dist/
+*.spec
+*.exe

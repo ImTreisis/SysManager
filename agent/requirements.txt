@@ -1,0 +1,4 @@
+# Dependencies for the local monitoring agent; installed in Milestone 2.
+fastapi
+uvicorn[standard]
+psutil
