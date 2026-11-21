@@ -36,6 +36,8 @@ python -m pip install -r requirements.txt
 
 To start the local agent after creating the environment, run `python main.py` from the `agent/` directory. It listens on `127.0.0.1:8765`.
 
+While the dashboard is open, it refreshes its readings every three seconds. It sends the next request after the current refresh finishes, so slow requests do not stack up. It keeps checking if the agent goes offline and reconnects automatically when the agent becomes available again.
+
 ## Privacy and network scope
 
 The agent binds only to `127.0.0.1`. The frontend requests system data directly from that local agent; this project does not use accounts or a database.

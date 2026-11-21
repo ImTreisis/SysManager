@@ -23,7 +23,7 @@ function Dashboard({ data, onTerminateProcess }) {
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-300">Your workstation</p>
           <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">System overview</h1>
-          <p className="mt-2 text-sm text-slate-400">Live readings collected by the agent on this computer.</p>
+          <p className="mt-2 text-sm text-slate-400">Updated every three seconds by the agent on this computer.</p>
         </div>
         <div className="rounded-xl border border-emerald-300/10 bg-emerald-300/[0.04] px-3.5 py-2.5 text-xs text-emerald-200">
           Connected to local agent

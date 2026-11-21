@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard.jsx';
 import Navbar from './components/Navbar.jsx';
 import { fetchDashboardData, LOCAL_AGENT_URL, terminateProcess } from './services/api.js';
 
+const REFRESH_INTERVAL_MS = 3000;
+
 function App() {
   const [page, setPage] = useState('dashboard');
   const [connection, setConnection] = useState('checking');
@@ -12,26 +14,39 @@ function App() {
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    let isCurrentRequest = true;
-    setConnection('checking');
+    if (page !== 'dashboard') return undefined;
 
-    fetchDashboardData()
-      .then((data) => {
-        if (isCurrentRequest) {
+    let isCurrentEffect = true;
+    let timeoutId;
+
+    async function refreshDashboard() {
+      const startedAt = Date.now();
+      try {
+        const data = await fetchDashboardData();
+        if (isCurrentEffect) {
           setDashboardData(data);
           setConnection('online');
         }
-      })
-      .catch(() => {
-        if (isCurrentRequest) {
+      } catch {
+        if (isCurrentEffect) {
           setConnection('offline');
         }
-      });
+      } finally {
+        if (isCurrentEffect) {
+          const requestDuration = Date.now() - startedAt;
+          const delay = Math.max(0, REFRESH_INTERVAL_MS - requestDuration);
+          timeoutId = window.setTimeout(refreshDashboard, delay);
+        }
+      }
+    }
+
+    refreshDashboard();
 
     return () => {
-      isCurrentRequest = false;
+      isCurrentEffect = false;
+      window.clearTimeout(timeoutId);
     };
-  }, [retryCount]);
+  }, [page, retryCount]);
 
   async function handleTerminateProcess(process) {
     const result = await terminateProcess(process);
