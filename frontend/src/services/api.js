@@ -37,3 +37,27 @@ export async function fetchDashboardData() {
 
   return { cpu, memory, disk, network, gpu, processes };
 }
+
+export async function terminateProcess(process) {
+  let response;
+
+  try {
+    response = await fetch(`${LOCAL_AGENT_URL}/api/processes/${process.pid}/terminate`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: process.name, create_time: process.create_time }),
+      cache: 'no-store',
+    });
+  } catch {
+    throw new Error('The local agent could not be reached. The process was not stopped.');
+  }
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.detail || `The local agent returned HTTP ${response.status}.`);
+  }
+  return result;
+}

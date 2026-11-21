@@ -2,7 +2,7 @@ import MetricCard from '../components/MetricCard.jsx';
 import ProcessTable from '../components/ProcessTable.jsx';
 import { formatBytes } from '../services/formatters.js';
 
-function Dashboard({ data }) {
+function Dashboard({ data, onTerminateProcess }) {
   const cpuPercent = Math.round(data.cpu.percent);
   const memoryPercent = Math.round(data.memory.percent);
   const diskPercent = Math.round(data.disk.percent);
@@ -120,7 +120,7 @@ function Dashboard({ data }) {
       </div>
 
       <div className="mt-5">
-        <ProcessTable processes={data.processes} />
+        <ProcessTable processes={data.processes} onTerminate={onTerminateProcess} />
       </div>
       <p className="mt-5 text-center text-xs text-slate-600">Data is requested directly from the local Python agent.</p>
     </main>

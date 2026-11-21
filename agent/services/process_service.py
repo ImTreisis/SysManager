@@ -53,6 +53,7 @@ def get_processes():
                 "cpu_percent": info["cpu_percent"] or 0.0,
                 "memory_bytes": memory_info.rss if memory_info else None,
                 "memory_percent": info["memory_percent"],
+                "create_time": info["create_time"],
                 "group": "App" if info["pid"] in app_process_ids else "Background process",
             }
         )

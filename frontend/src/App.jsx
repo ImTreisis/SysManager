@@ -3,7 +3,7 @@ import AgentInstructions from './pages/AgentInstructions.jsx';
 import AgentOffline from './pages/AgentOffline.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Navbar from './components/Navbar.jsx';
-import { fetchDashboardData, LOCAL_AGENT_URL } from './services/api.js';
+import { fetchDashboardData, LOCAL_AGENT_URL, terminateProcess } from './services/api.js';
 
 function App() {
   const [page, setPage] = useState('dashboard');
@@ -33,6 +33,22 @@ function App() {
     };
   }, [retryCount]);
 
+  async function handleTerminateProcess(process) {
+    const result = await terminateProcess(process);
+    try {
+      const updatedData = await fetchDashboardData();
+      setDashboardData(updatedData);
+    } catch {
+      if (result.status === 'terminated') {
+        setDashboardData((currentData) => ({
+          ...currentData,
+          processes: currentData.processes.filter((item) => item.pid !== process.pid),
+        }));
+      }
+    }
+    return result;
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <Navbar activePage={page} onNavigate={setPage} />
@@ -43,7 +59,7 @@ function App() {
       ) : connection === 'offline' ? (
         <AgentOffline agentUrl={LOCAL_AGENT_URL} onRetry={() => setRetryCount((count) => count + 1)} />
       ) : (
-        <Dashboard data={dashboardData} />
+        <Dashboard data={dashboardData} onTerminateProcess={handleTerminateProcess} />
       )}
     </div>
   );

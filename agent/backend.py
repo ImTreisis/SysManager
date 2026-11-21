@@ -1,9 +1,11 @@
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 
 from services.gpu_service import get_gpu_info
+from services.process_control import ProcessControlError, terminate_process
 from services.process_service import get_processes
 from services.system_service import (
     get_cpu_info,
@@ -19,12 +21,13 @@ allowed_origins = os.environ.get(
     "WINDOWS_MONITOR_ALLOWED_ORIGINS",
     "http://localhost:5173,http://127.0.0.1:5173",
 )
+allowed_origin_list = [origin.strip() for origin in allowed_origins.split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin.strip() for origin in allowed_origins.split(",") if origin.strip()],
+    allow_origins=allowed_origin_list,
     allow_credentials=False,
-    allow_methods=["GET"],
-    allow_headers=["Accept"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Accept", "Content-Type"],
 )
 
 
@@ -62,3 +65,21 @@ def read_gpu():
 @app.get("/api/processes")
 def read_processes():
     return get_processes()
+
+
+class TerminateProcessRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=260)
+    create_time: float = Field(allow_inf_nan=False)
+
+
+@app.post("/api/processes/{pid}/terminate")
+def stop_process(pid: int, body: TerminateProcessRequest, request: Request):
+    """Stop a selected process only when the request comes from an allowed website origin."""
+    origin = request.headers.get("origin")
+    if origin not in allowed_origin_list:
+        raise HTTPException(status_code=403, detail="This website origin is not allowed to control processes.")
+
+    try:
+        return terminate_process(pid, body.name, body.create_time)
+    except ProcessControlError as error:
+        raise HTTPException(status_code=error.status_code, detail=str(error)) from error
