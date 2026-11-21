@@ -42,8 +42,12 @@ While the dashboard is open, it refreshes its readings every three seconds. It s
 
 The agent binds only to `127.0.0.1`. The frontend requests system data directly from that local agent; this project does not use accounts or a database.
 
+When the frontend is opened from a hosted HTTPS site, browsers may require the user to allow loopback access before the page can contact `127.0.0.1`. The first request is started by the dashboard's Connect button if permission is not already granted. Localhost development does not need that prompt in browsers that recognize loopback development origins. Browser support and permission wording vary.
+
 ## Stopping a process
 
 The dashboard asks for confirmation before sending a stop request. The local agent accepts the request only from a website origin listed in `WINDOWS_MONITOR_ALLOWED_ORIGINS` (by default, the local Vite development URLs). It checks that the process name and start time still match the selected row, that the process belongs to the same Windows account as the agent, and that it is not a protected Windows or agent process. The agent requests a normal termination and does not force-kill a process that takes longer than three seconds to exit.
 
-Origin checks restrict which browser sites can send this request, but they are not user authentication. Keep the agent bound to localhost; do not expose it to the network. The browser compatibility and deployment security milestone will review the remaining protections before process control is exposed to a hosted website.
+The agent accepts only loopback Host values and the process-stop route requires an exact configured Origin. CORS allows the two local Vite development origins by default. To use a hosted frontend, configure `WINDOWS_MONITOR_ALLOWED_ORIGINS` for its exact HTTPS origin; do not use a wildcard. The browser also preflights the JSON POST request before allowing the action.
+
+Origin and Host checks protect against browser-based cross-site requests and DNS rebinding, but they are not user authentication. A local program can send its own HTTP request and forge headers. The browser confirmation protects against accidental clicks, not other local software. The agent runs with the current user's Windows permissions, listens only on `127.0.0.1`, and must not be exposed to the network or run as administrator without a specific need.

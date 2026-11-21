@@ -1,5 +1,20 @@
 export const LOCAL_AGENT_URL = import.meta.env.VITE_AGENT_URL || 'http://127.0.0.1:8765';
 
+export async function getLoopbackAccessState() {
+  const pageHost = window.location.hostname.toLowerCase();
+  if (['localhost', '127.0.0.1', '[::1]'].includes(pageHost)) return 'granted';
+  if (!window.isSecureContext) return 'insecure-context';
+  if (!navigator.permissions?.query) return 'prompt';
+
+  try {
+    const permission = await navigator.permissions.query({ name: 'loopback-network' });
+    return permission.state;
+  } catch {
+    // Older browsers may not know this permission name; let a user click initiate the request.
+    return 'prompt';
+  }
+}
+
 async function getJson(path) {
   let response;
 
@@ -8,6 +23,7 @@ async function getJson(path) {
       method: 'GET',
       headers: { Accept: 'application/json' },
       cache: 'no-store',
+      targetAddressSpace: 'loopback',
     });
   } catch {
     throw new Error('The local agent could not be reached.');
@@ -50,6 +66,7 @@ export async function terminateProcess(process) {
       },
       body: JSON.stringify({ name: process.name, create_time: process.create_time }),
       cache: 'no-store',
+      targetAddressSpace: 'loopback',
     });
   } catch {
     throw new Error('The local agent could not be reached. The process was not stopped.');

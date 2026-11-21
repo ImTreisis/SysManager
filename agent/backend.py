@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from services.gpu_service import get_gpu_info
 from services.process_control import ProcessControlError, terminate_process
@@ -29,6 +30,7 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Accept", "Content-Type"],
 )
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
 
 
 @app.get("/api/status")

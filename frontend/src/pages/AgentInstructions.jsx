@@ -52,7 +52,7 @@ function AgentInstructions() {
 
       <section className="mt-5 rounded-2xl border border-white/[0.07] bg-slate-900/50 p-5 sm:p-6">
         <h2 className="font-semibold text-white">How the browser connects</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-400">The dashboard requests readings directly from 127.0.0.1:8765. If the agent is stopped, the dashboard shows an offline message and lets you retry after starting it.</p>
+        <p className="mt-2 text-sm leading-6 text-slate-400">The dashboard requests readings directly from 127.0.0.1:8765. If a hosted HTTPS site needs local access, the browser may ask you to allow Loopback network access. Choose Connect in the dashboard to start that request. You can change this permission in the browser’s site settings.</p>
       </section>
     </main>
   );

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AgentInstructions from './pages/AgentInstructions.jsx';
 import AgentOffline from './pages/AgentOffline.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Navbar from './components/Navbar.jsx';
-import { fetchDashboardData, LOCAL_AGENT_URL, terminateProcess } from './services/api.js';
+import { fetchDashboardData, getLoopbackAccessState, LOCAL_AGENT_URL, terminateProcess } from './services/api.js';
 
 const REFRESH_INTERVAL_MS = 3000;
 
@@ -11,10 +11,50 @@ function App() {
   const [page, setPage] = useState('dashboard');
   const [connection, setConnection] = useState('checking');
   const [dashboardData, setDashboardData] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const [pollingEnabled, setPollingEnabled] = useState(false);
+
+  const startConnection = useCallback(async () => {
+    setConnection('checking');
+    try {
+      const data = await fetchDashboardData();
+      setDashboardData(data);
+      setConnection('online');
+      setPollingEnabled(true);
+    } catch {
+      const accessState = await getLoopbackAccessState();
+      if (accessState === 'denied') {
+        setConnection('permission-denied');
+      } else if (accessState === 'insecure-context') {
+        setConnection('insecure-context');
+      } else {
+        setConnection('offline');
+        if (accessState === 'granted') setPollingEnabled(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (page !== 'dashboard') return undefined;
+
+    let isCurrentEffect = true;
+    getLoopbackAccessState().then((accessState) => {
+      if (!isCurrentEffect) return;
+      if (accessState === 'granted') {
+        startConnection();
+      } else if (accessState === 'denied' || accessState === 'insecure-context') {
+        setConnection(accessState === 'denied' ? 'permission-denied' : 'insecure-context');
+      } else {
+        setConnection('permission-required');
+      }
+    });
+
+    return () => {
+      isCurrentEffect = false;
+    };
+  }, [page, startConnection]);
+
+  useEffect(() => {
+    if (page !== 'dashboard' || !pollingEnabled) return undefined;
 
     let isCurrentEffect = true;
     let timeoutId;
@@ -29,7 +69,14 @@ function App() {
         }
       } catch {
         if (isCurrentEffect) {
-          setConnection('offline');
+          const accessState = await getLoopbackAccessState();
+          if (accessState === 'denied' || accessState === 'insecure-context') {
+            setConnection(accessState === 'denied' ? 'permission-denied' : 'insecure-context');
+            setPollingEnabled(false);
+            isCurrentEffect = false;
+          } else {
+            setConnection('offline');
+          }
         }
       } finally {
         if (isCurrentEffect) {
@@ -40,13 +87,13 @@ function App() {
       }
     }
 
-    refreshDashboard();
+    timeoutId = window.setTimeout(refreshDashboard, REFRESH_INTERVAL_MS);
 
     return () => {
       isCurrentEffect = false;
       window.clearTimeout(timeoutId);
     };
-  }, [page, retryCount]);
+  }, [page, pollingEnabled]);
 
   async function handleTerminateProcess(process) {
     const result = await terminateProcess(process);
@@ -72,7 +119,9 @@ function App() {
       ) : connection === 'checking' ? (
         <main className="mx-auto max-w-3xl px-5 py-16 text-center text-slate-400 sm:px-8">Checking the local monitoring agent…</main>
       ) : connection === 'offline' ? (
-        <AgentOffline agentUrl={LOCAL_AGENT_URL} onRetry={() => setRetryCount((count) => count + 1)} />
+        <AgentOffline agentUrl={LOCAL_AGENT_URL} connection={connection} onRetry={startConnection} />
+      ) : connection === 'permission-required' || connection === 'permission-denied' || connection === 'insecure-context' ? (
+        <AgentOffline agentUrl={LOCAL_AGENT_URL} connection={connection} onRetry={startConnection} />
       ) : (
         <Dashboard data={dashboardData} onTerminateProcess={handleTerminateProcess} />
       )}
