@@ -41,7 +41,7 @@ def get_processes():
     app_process_ids = get_visible_window_process_ids()
 
     for process in psutil.process_iter(
-        ["pid", "name", "cpu_percent", "memory_info", "memory_percent"],
+        ["pid", "name", "cpu_percent", "memory_info", "memory_percent", "create_time"],
         ad_value=None,
     ):
         info = process.info
