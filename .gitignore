@@ -20,4 +20,5 @@ npm-debug.log*
 agent/build/
 agent/dist/
 *.spec
+!agent/WindowsSystemMonitorAgent.spec
 *.exe

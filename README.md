@@ -36,6 +36,19 @@ python -m pip install -r requirements.txt
 
 To start the local agent after creating the environment, run `python main.py` from the `agent/` directory. It listens on `127.0.0.1:8765`.
 
+## Build the Windows agent executable
+
+Run these commands from the `agent/` folder after creating and activating its virtual environment:
+
+```powershell
+python -m pip install -r requirements.txt
+.\build_windows_exe.ps1
+```
+
+The build script uses `WindowsSystemMonitorAgent.spec` to create `agent/dist/WindowsSystemMonitorAgent.exe`. PyInstaller bundles Python and the agent's dependencies, so the person running this executable does not need to install Python. Build it on Windows for the same architecture you plan to distribute; PyInstaller does not cross-compile.
+
+The executable uses a console for startup errors and service logs. When started from PowerShell it uses that window; when opened directly it gets its own. Leave it open while monitoring, then press Ctrl+C to shut down cleanly. The build and executable folders are excluded from Git; commit the source and packaging configuration, not the generated `.exe`.
+
 While the dashboard is open, it refreshes its readings every three seconds. It sends the next request after the current refresh finishes, so slow requests do not stack up. It keeps checking if the agent goes offline and reconnects automatically when the agent becomes available again.
 
 ## Privacy and network scope
