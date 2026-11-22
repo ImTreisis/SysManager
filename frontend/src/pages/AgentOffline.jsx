@@ -27,12 +27,16 @@ function AgentOffline({ agentUrl, connection, onRetry }) {
 
         <div className="mt-7 space-y-4">
           {!permissionRequired && !permissionDenied && !insecureContext && <div>
-            <h2 className="font-medium text-white">From the project folder, run these PowerShell commands:</h2>
-            <pre className="mt-3 overflow-x-auto rounded-xl border border-white/[0.06] bg-slate-950 px-4 py-4 text-sm leading-6 text-slate-200"><code>{`cd agent
+            <h2 className="font-medium text-white">Start the Windows agent</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">Download and open the agent on this computer. Keep its console window open while using the dashboard. For a hosted website, configure its exact HTTPS origin first under Agent setup.</p>
+            <a href="/downloads/WindowsSystemMonitorAgent.exe" download className="mt-3 inline-flex rounded-lg bg-sky-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 focus:ring-offset-slate-900">Download Windows agent (.exe)</a>
+            <details className="mt-5">
+              <summary className="cursor-pointer text-sm font-medium text-slate-300">Run from source instead</summary>
+              <pre className="mt-3 overflow-x-auto rounded-xl border border-white/[0.06] bg-slate-950 px-4 py-4 text-sm leading-6 text-slate-200"><code>{`cd agent
 & ./.venv/Scripts/Activate.ps1
 python main.py`}</code></pre>
+            </details>
           </div>}
-          {!permissionRequired && !permissionDenied && !insecureContext && <p className="text-sm leading-6 text-slate-500">Keep that PowerShell window open while using the dashboard. The agent listens on this computer only.</p>}
           {!insecureContext && <button
             type="button"
             onClick={onRetry}

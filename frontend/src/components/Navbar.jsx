@@ -32,9 +32,13 @@ function Navbar({ activePage, onNavigate }) {
           ))}
         </nav>
 
-        <div className="hidden rounded-full border border-amber-300/15 bg-amber-300/5 px-3 py-1.5 text-xs font-medium text-amber-200 sm:block">
-          Sample preview
-        </div>
+        <a
+          href="/downloads/WindowsSystemMonitorAgent.exe"
+          download
+          className="rounded-lg bg-sky-400 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 focus:ring-offset-slate-950"
+        >
+          Download Windows agent
+        </a>
       </div>
     </header>
   );

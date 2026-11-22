@@ -45,9 +45,9 @@ python -m pip install -r requirements.txt
 .\build_windows_exe.ps1
 ```
 
-The build script uses `WindowsSystemMonitorAgent.spec` to create `agent/dist/WindowsSystemMonitorAgent.exe`. PyInstaller bundles Python and the agent's dependencies, so the person running this executable does not need to install Python. Build it on Windows for the same architecture you plan to distribute; PyInstaller does not cross-compile.
+The build script uses `WindowsSystemMonitorAgent.spec` to create `agent/dist/WindowsSystemMonitorAgent.exe` and copies it to `frontend/public/downloads/WindowsSystemMonitorAgent.exe` for the website download. PyInstaller bundles Python and the agent's dependencies, so the person running this executable does not need to install Python. Build it on Windows for the same architecture you plan to distribute; PyInstaller does not cross-compile.
 
-The executable uses a console for startup errors and service logs. When started from PowerShell it uses that window; when opened directly it gets its own. Leave it open while monitoring, then press Ctrl+C to shut down cleanly. The build and executable folders are excluded from Git; commit the source and packaging configuration, not the generated `.exe`.
+The executable uses a console for startup errors and service logs. When started from PowerShell it uses that window; when opened directly it gets its own. Leave it open while monitoring, then press Ctrl+C to shut down cleanly. The intermediate `agent/build/` and `agent/dist/` directories are excluded from Git; the website copy in `frontend/public/downloads/` is intentionally committed so Vercel can serve it.
 
 While the dashboard is open, it refreshes its readings every three seconds. It sends the next request after the current refresh finishes, so slow requests do not stack up. It keeps checking if the agent goes offline and reconnects automatically when the agent becomes available again.
 
@@ -61,6 +61,13 @@ When the frontend is opened from a hosted HTTPS site, browsers may require the u
 
 The dashboard asks for confirmation before sending a stop request. The local agent accepts the request only from a website origin listed in `WINDOWS_MONITOR_ALLOWED_ORIGINS` (by default, the local Vite development URLs). It checks that the process name and start time still match the selected row, that the process belongs to the same Windows account as the agent, and that it is not a protected Windows or agent process. The agent requests a normal termination and does not force-kill a process that takes longer than three seconds to exit.
 
-The agent accepts only loopback Host values and the process-stop route requires an exact configured Origin. CORS allows the two local Vite development origins by default. To use a hosted frontend, configure `WINDOWS_MONITOR_ALLOWED_ORIGINS` for its exact HTTPS origin; do not use a wildcard. The browser also preflights the JSON POST request before allowing the action.
+The agent accepts only loopback Host values and the process-stop route requires an exact configured Origin. CORS allows the two local Vite development origins by default. To use a hosted frontend, open PowerShell in the folder containing the executable, set `WINDOWS_MONITOR_ALLOWED_ORIGINS` to the exact HTTPS origin, and launch the executable from that same window. For example, replace the example domain below with the deployed Vercel domain:
+
+```powershell
+$env:WINDOWS_MONITOR_ALLOWED_ORIGINS = "https://your-project.vercel.app"
+.\WindowsSystemMonitorAgent.exe
+```
+
+Do not use a wildcard. This environment variable applies only to that PowerShell window. The browser also preflights the JSON POST request before allowing the action.
 
 Origin and Host checks protect against browser-based cross-site requests and DNS rebinding, but they are not user authentication. A local program can send its own HTTP request and forge headers. The browser confirmation protects against accidental clicks, not other local software. The agent runs with the current user's Windows permissions, listens only on `127.0.0.1`, and must not be exposed to the network or run as administrator without a specific need.
