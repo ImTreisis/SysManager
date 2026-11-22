@@ -1,5 +1,3 @@
-import os
-
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -18,11 +16,11 @@ from services.system_service import (
 
 app = FastAPI(title="Windows System Monitor Agent")
 
-allowed_origins = os.environ.get(
-    "WINDOWS_MONITOR_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173",
-)
-allowed_origin_list = [origin.strip() for origin in allowed_origins.split(",") if origin.strip()]
+allowed_origin_list = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://sys-manager-nu.vercel.app",
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origin_list,

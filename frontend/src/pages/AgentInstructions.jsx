@@ -36,11 +36,8 @@ function AgentInstructions() {
       </section>
 
       <section className="mt-5 rounded-2xl border border-white/[0.07] bg-slate-900/50 p-5 sm:p-6">
-        <h2 className="font-semibold text-white">Allow your hosted website</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-400">The agent allows local development addresses by default. Before running the executable from a hosted site, open PowerShell in the folder containing the download, replace the example with your site’s exact HTTPS origin, then launch the agent in that same window:</p>
-        <pre className="mt-3 overflow-x-auto rounded-xl border border-white/[0.06] bg-slate-950 px-4 py-3 text-sm leading-6 text-slate-200"><code>{String.raw`$env:WINDOWS_MONITOR_ALLOWED_ORIGINS = "https://your-project.vercel.app"
-.\WindowsSystemMonitorAgent.exe`}</code></pre>
-        <p className="mt-2 text-sm leading-5 text-slate-500">Use only the origin, with no path after the domain. The setting applies to that PowerShell window and is cleared when it closes.</p>
+        <h2 className="font-semibold text-white">Hosted connection</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-400">The agent is configured in its source code to accept this project’s production site at <code className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-200">https://sys-manager-nu.vercel.app</code> and the local Vite development addresses. No PowerShell origin setting is needed. If your deployed domain changes, update the allowed origin in the agent code and rebuild the download.</p>
       </section>
 
       <details className="mt-5 rounded-2xl border border-white/[0.07] bg-slate-900/50 p-5 sm:p-6">
@@ -51,7 +48,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 .\build_windows_exe.ps1`}</code></pre>
-        <p className="mt-2 text-sm leading-5 text-slate-500">The script builds the executable and updates the website’s downloadable copy in <code>frontend/public/downloads</code>.</p>
+        <p className="mt-2 text-sm leading-5 text-slate-500">The script builds the executable and updates the website’s downloadable copy in <code>frontend/public/downloads</code>, including the allowed site origin configured in the agent code.</p>
       </details>
 
       <section className="mt-5 rounded-2xl border border-white/[0.07] bg-slate-900/50 p-5 sm:p-6">

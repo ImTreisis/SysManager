@@ -59,15 +59,8 @@ When the frontend is opened from a hosted HTTPS site, browsers may require the u
 
 ## Stopping a process
 
-The dashboard asks for confirmation before sending a stop request. The local agent accepts the request only from a website origin listed in `WINDOWS_MONITOR_ALLOWED_ORIGINS` (by default, the local Vite development URLs). It checks that the process name and start time still match the selected row, that the process belongs to the same Windows account as the agent, and that it is not a protected Windows or agent process. The agent requests a normal termination and does not force-kill a process that takes longer than three seconds to exit.
+The dashboard asks for confirmation before sending a stop request. The local agent accepts the request only from a website origin in the source allowlist in `agent/backend.py`. It checks that the process name and start time still match the selected row, that the process belongs to the same Windows account as the agent, and that it is not a protected Windows or agent process. The agent requests a normal termination and does not force-kill a process that takes longer than three seconds to exit.
 
-The agent accepts only loopback Host values and the process-stop route requires an exact configured Origin. CORS allows the two local Vite development origins by default. To use a hosted frontend, open PowerShell in the folder containing the executable, set `WINDOWS_MONITOR_ALLOWED_ORIGINS` to the exact HTTPS origin, and launch the executable from that same window. For example, replace the example domain below with the deployed Vercel domain:
-
-```powershell
-$env:WINDOWS_MONITOR_ALLOWED_ORIGINS = "https://your-project.vercel.app"
-.\WindowsSystemMonitorAgent.exe
-```
-
-Do not use a wildcard. This environment variable applies only to that PowerShell window. The browser also preflights the JSON POST request before allowing the action.
+The agent accepts only loopback Host values and the process-stop route requires an exact configured Origin. CORS allows the two local Vite development origins and the production frontend origin `https://sys-manager-nu.vercel.app`, defined in `agent/backend.py`. No runtime environment variable is needed for that deployment. If the production domain changes, update the source allowlist and rebuild the executable. The browser also preflights the JSON POST request before allowing the action.
 
 Origin and Host checks protect against browser-based cross-site requests and DNS rebinding, but they are not user authentication. A local program can send its own HTTP request and forge headers. The browser confirmation protects against accidental clicks, not other local software. The agent runs with the current user's Windows permissions, listens only on `127.0.0.1`, and must not be exposed to the network or run as administrator without a specific need.
